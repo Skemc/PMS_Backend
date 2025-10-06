@@ -1,4 +1,4 @@
-// Models/index.js
+// src/Models/index.js
 import { Sequelize, DataTypes } from "sequelize";
 import InvoiceModel from "./invoice.js";
 import TruckModel from "./truck.js";
@@ -13,65 +13,49 @@ import CargoTallyModel from "./cargoTally.js";
 import CargoStorageModel from "./cargoStorage.js";
 import FacilityModel from "./facility.js";
 
-export default async function initModels(
-  providedSequelize = null,
-  SequelizeClass = null
-) {
-  const sequelize =
-    providedSequelize ||
-    new Sequelize(
-      process.env.DATABASE_URL || "postgres://postgres:12345@localhost:5432/PMS"
-    );
-  const DataTypesLocal =
-    SequelizeClass && SequelizeClass.DataTypes
-      ? SequelizeClass.DataTypes
-      : DataTypes;
+const sequelize = new Sequelize(
+  process.env.DATABASE_URL || "postgres://postgres:12345@localhost:5432/PMS"
+);
 
-  const Invoice = InvoiceModel(sequelize, DataTypesLocal);
-  const Truck = TruckModel(sequelize, DataTypesLocal);
-  const Boat = BoatModel(sequelize, DataTypesLocal);
-  const Receipt = ReceiptModel(sequelize, DataTypesLocal);
-  const User = UserModel(sequelize, DataTypesLocal);
-  const Tariff = TariffModel(sequelize, DataTypesLocal);
-  const Vessel = VesselModel(sequelize, DataTypesLocal);
-  const VesselBerthing = VesselBerthingModel(sequelize, DataTypesLocal);
-  const CargoArrival = CargoArrivalModel(sequelize, DataTypesLocal);
-  const CargoTally = CargoTallyModel(sequelize, DataTypesLocal);
-  const CargoStorage = CargoStorageModel(sequelize, DataTypesLocal);
-  const Facility = FacilityModel(sequelize, DataTypesLocal);
+const models = {
+  Invoice: InvoiceModel(sequelize, DataTypes),
+  Truck: TruckModel(sequelize, DataTypes),
+  Boat: BoatModel(sequelize, DataTypes),
+  Receipt: ReceiptModel(sequelize, DataTypes),
+  User: UserModel(sequelize, DataTypes),
+  Tariff: TariffModel(sequelize, DataTypes),
+  Vessel: VesselModel(sequelize, DataTypes),
+  VesselBerthing: VesselBerthingModel(sequelize, DataTypes),
+  CargoArrival: CargoArrivalModel(sequelize, DataTypes),
+  CargoTally: CargoTallyModel(sequelize, DataTypes),
+  CargoStorage: CargoStorageModel(sequelize, DataTypes),
+  Facility: FacilityModel(sequelize, DataTypes),
+};
 
-  // optionally set associations here
+// Associations
+models.Vessel.hasMany(models.VesselBerthing, {
+  as: "berthings",
+  foreignKey: "vesselId",
+  onDelete: "CASCADE",
+});
+models.VesselBerthing.belongsTo(models.Vessel, { foreignKey: "vesselId" });
 
-  return {
-    sequelize,
-    Sequelize: SequelizeClass || Sequelize,
-    Invoice,
-    Truck,
-    Boat,
-    Receipt,
-    User,
-    Tariff,
-    Vessel,
-    VesselBerthing,
-    CargoArrival,
-    CargoTally,
-    CargoStorage,
-    Facility,
-  };
+models.CargoArrival.hasMany(models.CargoTally, {
+  as: "tallies",
+  foreignKey: "arrivalId",
+  onDelete: "CASCADE",
+});
+models.CargoTally.belongsTo(models.CargoArrival, { foreignKey: "arrivalId" });
 
-  Vessel.hasMany(VesselBerthing, {
-    as: "berthings",
-    foreignKey: "vesselId",
-    onDelete: "CASCADE",
-  });
-  VesselBerthing.belongsTo(Vessel, { foreignKey: "vesselId" });
+models.CargoArrival.belongsTo(models.User, {
+  as: "creator",
+  foreignKey: "createdBy",
+});
+models.User.hasMany(models.CargoArrival, { foreignKey: "createdBy" });
 
-  CargoArrival.hasMany(CargoTally, {
-    as: "tallies",
-    foreignKey: "arrivalId",
-    onDelete: "CASCADE",
-  });
-  CargoTally.belongsTo(CargoArrival, { foreignKey: "arrivalId" });
-  CargoArrival.belongsTo(User, { as: "creator", foreignKey: "createdBy" });
-  User.hasMany(CargoArrival, { foreignKey: "createdBy" });
-}
+// Export models + sequelize instance + Sequelize class
+export default {
+  ...models,
+  sequelize,
+  Sequelize,
+};

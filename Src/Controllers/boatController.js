@@ -1,5 +1,7 @@
 import { onServerError, onError, onSuccess } from "../Utils/response.js";
-import Boat from "../Models/boat.js";
+import models from "../Models/index.js";
+
+const { Boat } = models;
 
 class BoatController {
   static async createBoat(req, res) {
@@ -15,7 +17,7 @@ class BoatController {
         arrivalTime: req.body.arrivalTime,
         exited: req.body.exited,
         exitTime: req.body.exitTime,
-        status: req.body.status
+        status: req.body.status,
       });
 
       return onSuccess(res, 201, " 🚤 Boat created successfully", { boat });
@@ -58,15 +60,16 @@ class BoatController {
           arrivalTime: req.body.arrivalTime,
           exited: req.body.exited,
           exitTime: req.body.exitTime,
-          status: req.body.status
+          status: req.body.status,
         },
         {
-          where: { boat_id: req.params.id, status: { [Op.ne]: 'Exited' } },
-          returning: true
+          where: { boat_id: req.params.id, status: { [Op.ne]: "Exited" } },
+          returning: true,
         }
       );
 
-      if (!updated) return onError(res, 404, "🚤 Boat not found or already exited");
+      if (!updated)
+        return onError(res, 404, "🚤 Boat not found or already exited");
       return onSuccess(res, 200, "🚤 Boat updated successfully");
     } catch (err) {
       console.error(err);

@@ -4,11 +4,11 @@ dotenv.config();
 export default {
   development: {
     username: process.env.DB_USER || "postgres",
-    password: process.env.DB_PASS || null,
-    database: process.env.DB_NAME || "my_database_dev",
+    password: process.env.DB_PASS || 12345,
+    database: process.env.DB_NAME || "PMS",
     host: process.env.DB_HOST || "127.0.0.1",
     dialect: "postgres",
-    logging: false
+    logging: false,
   },
   test: {
     username: process.env.DB_USER || "postgres",
@@ -16,7 +16,7 @@ export default {
     database: process.env.DB_NAME_TEST || "my_database_test",
     host: process.env.DB_HOST || "127.0.0.1",
     dialect: "postgres",
-    logging: false
+    logging: false,
   },
   production: {
     username: process.env.DB_USER,
@@ -24,6 +24,6 @@ export default {
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
     dialect: "postgres",
-    logging: false
-  }
+    logging: false,
+  },
 };

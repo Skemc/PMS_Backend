@@ -1,5 +1,7 @@
 import { onServerError, onError, onSuccess } from "../Utils/response.js";
-import Truck from "../Models/truck.js";
+import models from "../Models/index.js";
+
+const { Truck } = models;
 
 class TruckController {
   static async createTruck(req, res) {
@@ -16,7 +18,7 @@ class TruckController {
         arrivalTime: req.body.arrivalTime,
         exited: req.body.exited,
         exitTime: req.body.exitTime,
-        status: req.body.status
+        status: req.body.status,
       });
 
       return onSuccess(res, 201, " 🚚 Truck created successfully", { truck });
@@ -60,15 +62,16 @@ class TruckController {
           arrivalTime: req.body.arrivalTime,
           exited: req.body.exited,
           exitTime: req.body.exitTime,
-          status: req.body.status
+          status: req.body.status,
         },
         {
-          where: { truck_id: req.params.id, status: { [Op.ne]: 'Exited' } },
-          returning: true
+          where: { truck_id: req.params.id, status: { [Op.ne]: "Exited" } },
+          returning: true,
         }
       );
 
-      if (!updated) return onError(res, 404, "🚚 Truck not found or already exited");
+      if (!updated)
+        return onError(res, 404, "🚚 Truck not found or already exited");
       return onSuccess(res, 200, "🚚 Truck updated successfully");
     } catch (err) {
       console.error(err);
@@ -78,10 +81,34 @@ class TruckController {
 
   static async deleteTruck(req, res) {
     try {
-      const deleted = await Truck.destroy({ where: { truck_id: req.params.id } });
+      const deleted = await Truck.destroy({
+        where: { truck_id: req.params.id },
+      });
       if (!deleted) return onError(res, 404, "🚚 Truck not found");
       return onSuccess(res, 200, "🚚 Truck deleted successfully");
     } catch (err) {
+      return onServerError(res);
+    }
+  }
+
+  static async markTruckExited(req, res) {
+    try {
+      const truck = await Truck.findOne({ where: { truck_id: req.params.id } });
+      if (!truck) return onError(res, 404, "Truck not found");
+
+      if (truck.exited) return onError(res, 400, "Truck has already exited");
+
+      const exitTime = new Date().toTimeString().split(" ")[0]; // current time HH:MM:SS
+
+      truck.exitTime = exitTime;
+      truck.exited = true;
+      truck.status = "Exited";
+
+      await truck.save();
+
+      return onSuccess(res, 200, "Truck exited successfully", truck);
+    } catch (err) {
+      console.error(err);
       return onServerError(res);
     }
   }

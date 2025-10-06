@@ -1,34 +1,36 @@
-export default (models) => {
-  const { Vessel, VesselBerthing } = models;
+import models from "../Models/index.js";
 
-  return {
-    async registerVessel(data) {
-      return Vessel.create(data);
-    },
+const { Vessel, VesselBerthing, Sequelize } = models;
+const { Op } = Sequelize;
 
-    async berthVessel(vesselId, data) {
-      const vessel = await Vessel.findByPk(vesselId);
-      if (!vessel) throw new Error("Vessel not found");
+const vesselService = {
+  async registerVessel(data) {
+    return Vessel.create(data);
+  },
 
-      // Update vessel status to berthed
-      vessel.status = "berthed";
-      vessel.arrivalDate = data.ATA;
-      vessel.departureDate = data.ETD;
-      await vessel.save();
+  async berthVessel(vesselId, data) {
+    const vessel = await Vessel.findByPk(vesselId);
+    if (!vessel) throw new Error("Vessel not found");
 
-      return VesselBerthing.create({ ...data, vesselId });
-    },
+    vessel.status = "berthed";
+    vessel.arrivalDate = data.ATA;
+    vessel.departureDate = data.ETD;
+    await vessel.save();
 
-    async listVessels(filters) {
-      const where = {};
-      if (filters.status) where.status = filters.status;
-      if (filters.name)
-        where.name = { [models.Sequelize.Op.iLike]: `%${filters.name}%` };
-      return Vessel.findAll({ where, include: ["berthings"] });
-    },
+    return VesselBerthing.create({ ...data, vesselId });
+  },
 
-    async getVesselById(id) {
-      return Vessel.findByPk(id, { include: ["berthings"] });
-    },
-  };
+  async listVessels(filters) {
+    const where = {};
+    if (filters.status) where.status = filters.status;
+    if (filters.name) where.name = { [Op.iLike]: `%${filters.name}%` };
+
+    return Vessel.findAll({ where, include: ["berthings"] });
+  },
+
+  async getVesselById(id) {
+    return Vessel.findByPk(id, { include: ["berthings"] });
+  },
 };
+
+export default vesselService;

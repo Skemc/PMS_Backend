@@ -24,7 +24,7 @@ router.post(
   TruckController.createTruck
 );
 router.get("/trucks", auth.verifyToken, TruckController.getAllTrucks);
-router.get("/trucks/:id", auth.verifyToken, TruckController.getTruckById);
+router.get("/truck/:id", auth.verifyToken, TruckController.getTruckById);
 router.put(
   "/trucks/:id",
   auth.verifyToken,
@@ -41,7 +41,7 @@ router.post(
   BoatController.createBoat
 );
 router.get("/boats", auth.verifyToken, BoatController.getAllBoats);
-router.get("/boats/:id", auth.verifyToken, BoatController.getBoatById);
+router.get("/boat/:id", auth.verifyToken, BoatController.getBoatById);
 router.put(
   "/boats/:id",
   auth.verifyToken,
@@ -55,25 +55,45 @@ router.post(
   "/vessels",
   auth.verifyToken,
   //validators.vesselEntry,
-  VesselController.register
+  VesselController.registerVessel
+);
+router.post("/vessels/book/:id", auth.verifyToken, VesselController.bookVessel);
+router.post(
+  "/vessels/berth/:id",
+  auth.verifyToken,
+  VesselController.berthVessel
 );
 router.post(
-  "/vessels/:vesselId/berth",
+  "/vessels/unberth/:id",
   auth.verifyToken,
-  //validators.vesselBerthingEntry,
-  VesselController.berth
+  VesselController.unberthVessel
 );
-router.get("/vessels", auth.verifyToken, VesselController.list);
-router.get("/vessels/:id", auth.verifyToken, VesselController.getById);
+
+router.post("/vessels", auth.verifyToken, VesselController.getAllVessels);
+router.get("/vessels/:id", auth.verifyToken, VesselController.getVesselById);
+router.get(
+  "/vessels/berthed",
+  auth.verifyToken,
+  VesselController.getAllBerthedVessels
+);
+router.get(
+  "/vessels/berth/:id",
+  auth.verifyToken,
+  VesselController.getBerthedVesselById
+);
 
 //General Routes
 router.post(
   "/auth/user/register",
-  auth.verifyToken,
+  //auth.verifyToken,
   validators.createUser,
   GeneralController.createUser
 );
-router.post("/auth/user/login", GeneralController.login);
+router.post(
+  "/auth/user/login",
+  //auth.verifyToken,
+  GeneralController.login
+);
 router.post(
   "/auth/forgot-password",
   validators.emailValidator,

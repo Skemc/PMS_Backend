@@ -1,9 +1,12 @@
 import bcrypt from "bcrypt";
 import { onServerError, onError, onSuccess } from "../Utils/response.js";
 import helpers from "../Utils/helpers.js";
-//import SendNotification from "../Services/sendMailer.js";
 import generator from "generate-password";
-import User from "../Models/user.js";
+import models from "../Models/index.js";
+import { log } from "console";
+
+const { Op } = require("sequelize");
+const { User } = models;
 
 class GeneralController {
   static async createUser(req, res) {
@@ -12,17 +15,8 @@ class GeneralController {
       const hashedPassword = await helpers.hashPassword(password);
       const userId = helpers.generateUniqueId();
 
-      const existingUser = await User.findOne({
-        where: {
-          [Op.or]: [{ userName }, { email }],
-        },
-      });
-
-      if (existingUser)
-        return onError(res, 400, "User with this username or email already exists");
-
       const newUser = await User.create({
-        user_id: userId,
+        //user_id: userId,
         firstName,
         lastName,
         userName,
@@ -67,7 +61,7 @@ class GeneralController {
 
       const token = helpers.generateResetToken(user, user.password);
 
-     // const url = `https://pms.rw/auth/reset-password?email=${email}&token=${token}`;
+      // const url = `https://pms.rw/auth/reset-password?email=${email}&token=${token}`;
 
       //await SendNotification.sendEmail(user, url);
       return onSuccess(res, 201, "Password reset link sent to your email", url);

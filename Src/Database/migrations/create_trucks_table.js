@@ -1,74 +1,73 @@
 export async function up(queryInterface, Sequelize) {
-  await queryInterface.createTable('trucks', {
+  await queryInterface.createTable("trucks", {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     truck_id: {
       type: Sequelize.STRING,
-      unique: true
+      unique: true,
     },
     plateNumber: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    cargoOwner: { 
+    cargoOwner: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    cargoType: { 
+    cargoType: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    driverNames: { 
+    driverNames: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    driverContacts: { 
+    driverContacts: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    fullOrEmpty: { 
+    fullOrEmpty: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    sealNumber: { 
+    sealNumber: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    arrivalDate: { 
+    arrivalDate: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    arrivalTime: { 
-      type: Sequelize.DATE,
-      allowNull: false
+    arrivalTime: {
+      type: Sequelize.TIME,
+      allowNull: false,
     },
-    exited: { 
+    exited: {
       type: Sequelize.BOOLEAN,
-      allowNull: false
+      allowNull: false,
     },
-    exitTime: { 
-      type: Sequelize.DATE,
-      allowNull: false
+    exitTime: {
+      type: Sequelize.TIME,
+      allowNull: true,
     },
-    status: { 
+    status: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     createdAt: {
       type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.NOW,
     },
     updatedAt: {
       type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
-    }
+      defaultValue: Sequelize.NOW,
+    },
   });
 }
 
 export async function down(queryInterface) {
-  await queryInterface.dropTable('trucks');
+  await queryInterface.dropTable("trucks");
 }
-

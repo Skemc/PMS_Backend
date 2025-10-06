@@ -6,16 +6,16 @@ class Helpers {
     this.options = { expiresIn: "24h" };
   }
 
-  tokenGenerator(info) {
+  tokenGenerator(newUser) {
     try {
       this.payload = {
-        names: info.names,
-        email: info.email,
-        user_id: info.user_id,
-        id: info.id,
-        role: info.role,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        user_id: newUser.user_id,
+        role: newUser.role,
       };
-      const secret = process.env.JWT_TOKEN;
+      const secret = process.env.JWT_SECRET;
       const token = jwt.sign(this.payload, secret, this.options);
       return token;
     } catch (err) {
@@ -27,7 +27,7 @@ class Helpers {
     try {
       this.salt = await bcrypt.genSalt(10);
       this.passHash = await bcrypt.hash(password, this.salt);
-      console.log(this.passHash, "password");
+      // console.log(this.passHash, "password");
       return this.passHash;
     } catch (err) {
       return err;

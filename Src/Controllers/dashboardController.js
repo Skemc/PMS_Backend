@@ -2,19 +2,20 @@
 import models from "../Models/index.js";
 import { onError } from "../Utils/response.js";
 
-const { Truck, Vessel, Boat, Cargo, Storage, Invoice, User } = models;
+const { Truck, Vessel, Boat, CargoArrival, CargoStorage, Invoice, User } =
+  models;
 
 const DashboardController = {
   // (A) MAIN DASHBOARD
   async main(req, res) {
     try {
       const totalTrucksInPort = await Truck.count({
-        where: { status: "IN_PORT" },
+        where: { status: "Parked" },
       });
       const totalVesselsDocked = await Vessel.count({
-        where: { status: "DOCKED" },
+        where: { status: "Berthed" },
       });
-      const totalCargoInStorage = (await Storage.sum("current_quantity")) || 0;
+      const totalCargoInStorage = (await CargoStorage.sum("totalWeight")) || 0;
 
       const todayRevenue =
         (await Invoice.sum("amount", {
@@ -28,7 +29,11 @@ const DashboardController = {
       const monthlyRevenue =
         (await Invoice.sum("amount", {
           where: models.sequelize.where(
-            models.sequelize.fn("MONTH", models.sequelize.col("createdAt")),
+            models.sequelize.fn(
+              "DATE_PART",
+              "month",
+              models.sequelize.col("createdAt")
+            ),
             "=",
             new Date().getMonth() + 1
           ),
@@ -36,12 +41,12 @@ const DashboardController = {
 
       const totalInvoicesGenerated = await Invoice.count();
 
-      const overstayedTrucks = await Truck.count({
+      /*const overstayedTrucks = await Truck.count({
         where: { overstayed: true },
       });
       const overstayedVessels = await Vessel.count({
         where: { overstayed: true },
-      });
+      });*/
       const pendingInvoices = await Invoice.count({
         where: { status: "PENDING" },
       });
@@ -53,7 +58,11 @@ const DashboardController = {
         totalRevenueToday: todayRevenue,
         monthlyRevenue,
         totalInvoicesGenerated,
-        alerts: { overstayedTrucks, overstayedVessels, pendingInvoices },
+        alerts: {
+          //overstayedTrucks,
+          //overstayedVessels,
+          pendingInvoices,
+        },
       });
     } catch (err) {
       return onError(res, 500, err.message);
@@ -64,32 +73,23 @@ const DashboardController = {
   async trucks(req, res) {
     try {
       const totalTrucksInPort = await Truck.count({
-        where: { status: "IN_PORT" },
+        where: { status: "Parked" },
       });
-      const invoiced = await Truck.count({ where: { invoiced: true } });
-      const nonInvoiced = await Truck.count({ where: { invoiced: false } });
-      const overstayed = await Truck.count({ where: { overstayed: true } });
+      //const invoiced = await Truck.count({ where: { invoiced: true } });
+      //const nonInvoiced = await Truck.count({ where: { invoiced: false } });
+      //const overstayed = await Truck.count({ where: { overstayed: true } });
 
       const todayRevenue =
         (await Invoice.sum("amount", {
-          where: { entityType: "TRUCK" },
+          where: { transaction_type: "truck" },
         })) || 0;
-
-      const byTruckType = await Truck.findAll({
-        attributes: [
-          "type",
-          [models.sequelize.fn("COUNT", models.sequelize.col("id")), "count"],
-        ],
-        group: ["type"],
-      });
 
       return res.json({
         totalTrucksInPort,
-        invoiced,
-        nonInvoiced,
-        overstayed,
+        //invoiced,
+        //nonInvoiced,
+        // overstayed,
         revenue: { today: todayRevenue },
-        byTruckType,
       });
     } catch (err) {
       return onError(res, 500, err.message);
@@ -153,11 +153,13 @@ const DashboardController = {
   // (E) CARGO DASHBOARD
   async cargo(req, res) {
     try {
-      const cargoArrivals = await Cargo.count({ where: { status: "ARRIVED" } });
-      const cargoDepartures = await Cargo.count({
+      const cargoArrivals = await CargoArrival.count({
+        where: { status: "ARRIVED" },
+      });
+      const cargoDepartures = await CargoArrival.count({
         where: { status: "DEPARTED" },
       });
-      const totalWeightHandled = (await Cargo.sum("weight")) || 0;
+      const totalWeightHandled = (await CargoArrival.sum("weight")) || 0;
 
       const importRevenue =
         (await Invoice.sum("amount", {
@@ -192,12 +194,13 @@ const DashboardController = {
   // (F) STORAGE DASHBOARD
   async storage(req, res) {
     try {
-      const currentOccupancy = (await Storage.sum("current_quantity")) || 0;
+      const currentOccupancy =
+        (await CargoStorage.sum("current_quantity")) || 0;
       const maxCapacity = 2500; // can be fetched from DB if configurable
-      const gracePeriodItems = await Storage.count({
+      const gracePeriodItems = await CargoStorage.count({
         where: { withinGracePeriod: true },
       });
-      const tariffAppliedItems = await Storage.count({
+      const tariffAppliedItems = await CargoStorage.count({
         where: { withinGracePeriod: false },
       });
       const storageRevenue =

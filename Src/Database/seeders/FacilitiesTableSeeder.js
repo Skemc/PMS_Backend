@@ -1,4 +1,5 @@
 export async function up(queryInterface) {
+  await queryInterface.bulkDelete("Facilities", null, {});
   await queryInterface.bulkInsert("Facilities", [
     { name: "Office", type: "office", tariff: 120000, status: "available" },
     {

@@ -1,4 +1,5 @@
 export async function up(queryInterface) {
+  await queryInterface.bulkDelete("CargoArrivals", null, {});
   await queryInterface.bulkInsert("CargoArrivals", [
     {
       arrivalNumber: "1000",

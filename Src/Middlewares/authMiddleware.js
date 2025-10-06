@@ -1,17 +1,21 @@
 import jwt from "jsonwebtoken";
 import Database from "../database";
+import dotenv from "dotenv";
 import { onError } from "../Utils/response";
+
+dotenv.config();
 
 const db = new Database();
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecret"; // Load from .env
+const JWT_SECRET = process.env.JWT_SECRET; // Load from .env
 
 const authMiddleware = {
   /**
    * ✅ Verify that the request has a valid token
    */
   verifyToken(req, res, next) {
-    const token = req.header("x-auth-token");
+    const token =
+      req.header("x-auth-token") || req.header("authorization")?.split(" ")[1];
 
     if (!token) {
       return onError(res, 401, "No token provided! Please login first.");

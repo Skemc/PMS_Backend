@@ -6,9 +6,11 @@ export async function up(queryInterface, Sequelize) {
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+  await queryInterface.bulkDelete("users", null, {});
+
   return queryInterface.bulkInsert("users", [
     {
-      user_id: "101",
+      // user_id: "101",
       firstName: "KAREKEZI",
       lastName: "Eric",
       userName: "KEric",
@@ -18,7 +20,7 @@ export async function up(queryInterface, Sequelize) {
       created_on: new Date(),
     },
     {
-      user_id: "102",
+      //user_id: "102",
       firstName: "KARENZI",
       lastName: "Yves",
       userName: "KYves",
@@ -28,7 +30,7 @@ export async function up(queryInterface, Sequelize) {
       created_on: new Date(),
     },
     {
-      user_id: "103",
+      // user_id: "103",
       firstName: "MUKUNZI",
       lastName: "EDWARD",
       userName: "MEdward",
@@ -38,7 +40,7 @@ export async function up(queryInterface, Sequelize) {
       created_on: new Date(),
     },
     {
-      user_id: "104",
+      // user_id: "104",
       firstName: "MUSONI",
       lastName: "Patrick",
       userName: "MPatrick",

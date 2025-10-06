@@ -1,70 +1,69 @@
 export async function up(queryInterface, Sequelize) {
-  await queryInterface.createTable('boats', {
+  await queryInterface.createTable("boats", {
     id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
     },
     boat_id: {
       type: Sequelize.STRING,
-      unique: true
+      unique: true,
     },
     boatName: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    cargoOwner: { 
+    cargoOwner: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    cargoType: { 
+    cargoType: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    captainNames: { 
+    captainNames: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    captainContacts: { 
+    captainContacts: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    fullOrEmpty: { 
+    fullOrEmpty: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    arrivalDate: { 
+    arrivalDate: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
-    arrivalTime: { 
-      type: Sequelize.DATE,
-      allowNull: false
+    arrivalTime: {
+      type: Sequelize.TIME,
+      allowNull: false,
     },
-    exited: { 
+    exited: {
       type: Sequelize.BOOLEAN,
-      allowNull: false
+      allowNull: false,
     },
-    exitTime: { 
+    exitTime: {
       type: Sequelize.DATE,
-      allowNull: false
+      allowNull: false,
     },
-    status: { 
+    status: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     createdAt: {
       type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.NOW,
     },
     updatedAt: {
       type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
-    }
+      defaultValue: Sequelize.NOW,
+    },
   });
 }
 
 export async function down(queryInterface) {
-  await queryInterface.dropTable('boats');
+  await queryInterface.dropTable("boats");
 }
-

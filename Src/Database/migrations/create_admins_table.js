@@ -1,13 +1,15 @@
 export async function up(queryInterface, Sequelize) {
   await queryInterface.createTable("users", {
-    id: {
+    /* id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-    },
+    }, */
     user_id: {
-      type: Sequelize.STRING(50),
+      type: Sequelize.INTEGER,
       allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
       unique: true,
     },
     firstName: {

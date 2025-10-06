@@ -1,3 +1,4 @@
+// src/Models/receipt.js
 export default (sequelize, DataTypes) => {
   const Receipt = sequelize.define(
     "Receipt",
@@ -6,7 +7,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         unique: true, // one-to-one with invoice
-        references: { model: Invoice, key: "id" },
       },
       transaction_type: {
         type: DataTypes.STRING,
@@ -25,11 +25,18 @@ export default (sequelize, DataTypes) => {
       },
     },
     {
-      sequelize,
-      modelName: "Receipt",
       tableName: "Receipts",
+      timestamps: true,
     }
   );
+
+  // Association placeholder
+  Receipt.associate = (models) => {
+    Receipt.belongsTo(models.Invoice, {
+      foreignKey: "invoice_id",
+      as: "invoice",
+    });
+  };
 
   return Receipt;
 };
